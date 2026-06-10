@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     environment {
         CONTAINER_NAME  = 'pharmeasy-backend'
         IMAGE_NAME      = 'pharmeasy-backend'
@@ -8,6 +12,9 @@ pipeline {
         DB_CONTAINER    = 'pharmeasy-mysql'
         PORT_MAPPING    = '8081:8080'
         DOCKER_BUILDKIT = '0'
+        HTTP_PROXY      = 'http://http.docker.internal:3128'
+        HTTPS_PROXY     = 'http://http.docker.internal:3128'
+        NO_PROXY        = 'localhost,127.0.0.1'
 
         // ── Secrets ────────────────────────────────────────────────────────
         // Add these in Jenkins → Manage Jenkins → Credentials → Global:
@@ -21,6 +28,11 @@ pipeline {
 
         stage('Checkout') {
             steps {
+                // Route Git through the corporate Sophos proxy before cloning.
+                // http.docker.internal:3128 is Docker Desktop's proxy endpoint,
+                // reachable from the Windows host as well as from containers.
+                bat 'git config --global http.proxy http://http.docker.internal:3128'
+                bat 'git config --global https.proxy http://http.docker.internal:3128'
                 checkout scm
             }
         }
@@ -28,10 +40,8 @@ pipeline {
         stage('Ensure MySQL Running') {
             steps {
                 script {
-                    // Create network if it doesn't exist
                     bat "docker network create ${NETWORK_NAME} 2>nul || ver >nul"
 
-                    // Use returnStatus so a missing container (exit code 1) doesn't crash the pipeline
                     def mysqlExitCode = bat(
                         script: "docker inspect -f {{.State.Running}} ${DB_CONTAINER}",
                         returnStatus: true
@@ -69,7 +79,6 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
-                    // Stop and remove existing container if running
                     bat "docker stop ${CONTAINER_NAME} 2>nul || ver >nul"
                     bat "docker rm   ${CONTAINER_NAME} 2>nul || ver >nul"
 
@@ -111,7 +120,6 @@ pipeline {
             steps {
                 script {
                     sleep(time: 10, unit: 'SECONDS')
-                    // Use returnStatus — exit code 0 means container exists and inspect succeeded
                     def exitCode = bat(
                         script: "docker inspect -f {{.State.Running}} ${CONTAINER_NAME}",
                         returnStatus: true
@@ -131,10 +139,22 @@ pipeline {
         }
         failure {
             echo "PharmEasy backend pipeline failed. Check the logs above for details."
-            bat "docker logs ${CONTAINER_NAME} 2>nul || ver >nul"
+            script {
+                try {
+                    bat "docker logs ${env.CONTAINER_NAME} 2>nul || ver >nul"
+                } catch (Exception e) {
+                    echo "Could not fetch container logs (container may not have started): ${e.message}"
+                }
+            }
         }
         always {
-            bat "docker image prune -f 2>nul || ver >nul"
+            script {
+                try {
+                    bat "docker image prune -f 2>nul || ver >nul"
+                } catch (Exception e) {
+                    echo "Could not prune images: ${e.message}"
+                }
+            }
         }
     }
 }
