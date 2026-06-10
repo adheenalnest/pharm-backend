@@ -1,20 +1,20 @@
 pipeline {
     agent any
 
-    // Store these secrets in Jenkins → Manage Credentials → Global:
-    //   pharmeasy-db-connstring       (Secret text) — full MySQL connection string
-    //   pharmeasy-jwt-secret          (Secret text) — JWT signing key
-    //   pharmeasy-smtp-password       (Secret text) — Gmail app password
-    //   pharmeasy-razorpay-keysecret  (Secret text) — Razorpay secret key
-
     environment {
-        MYSQL_CONTAINER = 'pharmeasy-mysql'
-        MYSQL_IMAGE     = 'mysql:8.0'
         CONTAINER_NAME  = 'pharmeasy-backend'
         IMAGE_NAME      = 'pharmeasy-backend'
         NETWORK_NAME    = 'pharmeasy-network'
+        DB_CONTAINER    = 'pharmeasy-mysql'
         PORT_MAPPING    = '8081:8080'
         DOCKER_BUILDKIT = '0'
+
+        // ── Secrets ────────────────────────────────────────────────────────
+        // Add these in Jenkins → Manage Jenkins → Credentials → Global:
+        //   pharmeasy-db-connstring       (Secret text)
+        //   pharmeasy-jwt-secret          (Secret text)
+        //   pharmeasy-smtp-password       (Secret text)
+        //   pharmeasy-razorpay-keysecret  (Secret text)
     }
 
     stages {
@@ -25,42 +25,32 @@ pipeline {
             }
         }
 
-        stage('Pull Base Images') {
-            steps {
-                script {
-                    bat "docker pull mcr.microsoft.com/dotnet/aspnet:8.0 2>nul || echo WARN: could not pull aspnet:8.0, using local cache"
-                    bat "docker pull mcr.microsoft.com/dotnet/sdk:8.0    2>nul || echo WARN: could not pull sdk:8.0, using local cache"
-                    bat "docker pull ${MYSQL_IMAGE}                       2>nul || echo WARN: could not pull mysql:8.0, using local cache"
-                }
-            }
-        }
-
         stage('Ensure MySQL Running') {
             steps {
                 script {
+                    // Create network if it doesn't exist
                     bat "docker network create ${NETWORK_NAME} 2>nul || ver >nul"
 
                     def mysqlRunning = bat(
-                        script: "docker inspect -f {{.State.Running}} ${MYSQL_CONTAINER}",
+                        script: "docker inspect -f {{.State.Running}} ${DB_CONTAINER}",
                         returnStdout: true
                     ).trim()
 
                     if (!mysqlRunning.contains('true')) {
                         echo "MySQL container not running — starting it now."
-                        bat "docker rm ${MYSQL_CONTAINER} 2>nul || ver >nul"
+                        bat "docker rm ${DB_CONTAINER} 2>nul || ver >nul"
                         bat """
                             docker run -d ^
-                                --name ${MYSQL_CONTAINER} ^
+                                --name ${DB_CONTAINER} ^
                                 --network ${NETWORK_NAME} ^
                                 -p 3307:3306 ^
                                 --restart unless-stopped ^
                                 -e MYSQL_ROOT_PASSWORD=root ^
                                 -e MYSQL_DATABASE=pharmeasy ^
                                 -v pharmeasy-mysql-data:/var/lib/mysql ^
-                                ${MYSQL_IMAGE}
+                                mysql:8.0
                         """
-                        // Wait for MySQL to be ready before starting the backend
-                        echo "Waiting for MySQL to accept connections..."
+                        echo "Waiting for MySQL to be ready..."
                         sleep(time: 20, unit: 'SECONDS')
                     } else {
                         echo "MySQL container is already running."
@@ -78,14 +68,15 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
+                    // Stop and remove existing container if running
                     bat "docker stop ${CONTAINER_NAME} 2>nul || ver >nul"
                     bat "docker rm   ${CONTAINER_NAME} 2>nul || ver >nul"
 
                     withCredentials([
-                        string(credentialsId: 'pharmeasy-db-connstring',        variable: 'DB_CONN'),
-                        string(credentialsId: 'pharmeasy-jwt-secret',           variable: 'JWT_SECRET'),
-                        string(credentialsId: 'pharmeasy-smtp-password',        variable: 'SMTP_PASS'),
-                        string(credentialsId: 'pharmeasy-razorpay-keysecret',   variable: 'RAZORPAY_SECRET')
+                        string(credentialsId: 'pharmeasy-db-connstring',       variable: 'DB_CONN'),
+                        string(credentialsId: 'pharmeasy-jwt-secret',          variable: 'JWT_SECRET'),
+                        string(credentialsId: 'pharmeasy-smtp-password',       variable: 'SMTP_PASS'),
+                        string(credentialsId: 'pharmeasy-razorpay-keysecret',  variable: 'RAZORPAY_SECRET')
                     ]) {
                         bat """
                             docker run -d ^
