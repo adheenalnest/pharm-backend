@@ -12,9 +12,6 @@ pipeline {
         DB_CONTAINER    = 'pharmeasy-mysql'
         PORT_MAPPING    = '8081:8080'
         DOCKER_BUILDKIT = '0'
-        HTTP_PROXY      = 'http://http.docker.internal:3128'
-        HTTPS_PROXY     = 'http://http.docker.internal:3128'
-        NO_PROXY        = 'localhost,127.0.0.1'
 
         // ── Secrets ────────────────────────────────────────────────────────
         // Add these in Jenkins → Manage Jenkins → Credentials → Global:
@@ -28,11 +25,11 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                // Route Git through the corporate Sophos proxy before cloning.
-                // http.docker.internal:3128 is Docker Desktop's proxy endpoint,
-                // reachable from the Windows host as well as from containers.
-                bat 'git config --global http.proxy http://http.docker.internal:3128'
-                bat 'git config --global https.proxy http://http.docker.internal:3128'
+                // Use Windows native SSL stack (SChannel) so Git inherits the
+                // system proxy and trusts the Sophos CA cert automatically.
+                bat 'git config --global http.sslBackend schannel'
+                bat 'git config --global --unset http.proxy  || ver >nul'
+                bat 'git config --global --unset https.proxy || ver >nul'
                 checkout scm
             }
         }
