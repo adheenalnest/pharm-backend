@@ -12,13 +12,6 @@ pipeline {
         DB_CONTAINER    = 'pharmeasy-mysql'
         PORT_MAPPING    = '8081:8080'
         DOCKER_BUILDKIT = '0'
-
-        // ── Secrets ────────────────────────────────────────────────────────
-        // Add these in Jenkins → Manage Jenkins → Credentials → Global:
-        //   pharmeasy-db-connstring       (Secret text)
-        //   pharmeasy-jwt-secret          (Secret text)
-        //   pharmeasy-smtp-password       (Secret text)
-        //   pharmeasy-razorpay-keysecret  (Secret text)
     }
 
     stages {
@@ -79,36 +72,29 @@ pipeline {
                     bat "docker stop ${CONTAINER_NAME} 2>nul || ver >nul"
                     bat "docker rm   ${CONTAINER_NAME} 2>nul || ver >nul"
 
-                    withCredentials([
-                        string(credentialsId: 'pharmeasy-db-connstring',       variable: 'DB_CONN'),
-                        string(credentialsId: 'pharmeasy-jwt-secret',          variable: 'JWT_SECRET'),
-                        string(credentialsId: 'pharmeasy-smtp-password',       variable: 'SMTP_PASS'),
-                        string(credentialsId: 'pharmeasy-razorpay-keysecret',  variable: 'RAZORPAY_SECRET')
-                    ]) {
-                        bat """
-                            docker run -d ^
-                                --name ${CONTAINER_NAME} ^
-                                --network ${NETWORK_NAME} ^
-                                -p ${PORT_MAPPING} ^
-                                --restart unless-stopped ^
-                                -e ASPNETCORE_URLS=http://+:8080 ^
-                                -e "ConnectionStrings__DefaultConnection=%DB_CONN%" ^
-                                -e "Database__Provider=MySql" ^
-                                -e "Database__ConnectionString=%DB_CONN%" ^
-                                -e "Jwt__SecretKey=%JWT_SECRET%" ^
-                                -e "Smtp__Host=smtp.gmail.com" ^
-                                -e "Smtp__Port=587" ^
-                                -e "Smtp__Username=adheenalnest@gmail.com" ^
-                                -e "Smtp__Password=%SMTP_PASS%" ^
-                                -e "Smtp__From=adheenalnest@gmail.com" ^
-                                -e "Razorpay__KeyId=rzp_test_Syl5owGtFUehSW" ^
-                                -e "Razorpay__KeySecret=%RAZORPAY_SECRET%" ^
-                                -e "Razorpay__Currency=INR" ^
-                                -e "Razorpay__CallbackUrl=http://localhost:4201/order-success" ^
-                                -e "Razorpay__BookingCallbackUrl=http://localhost:4201/booking-success" ^
-                                ${IMAGE_NAME}:latest
-                        """
-                    }
+                    bat """
+                        docker run -d ^
+                            --name ${CONTAINER_NAME} ^
+                            --network ${NETWORK_NAME} ^
+                            -p ${PORT_MAPPING} ^
+                            --restart unless-stopped ^
+                            -e ASPNETCORE_URLS=http://+:8080 ^
+                            -e "ConnectionStrings__DefaultConnection=Server=pharmeasy-mysql;Port=3306;Database=pharmeasy;User=root;Password=root;" ^
+                            -e "Database__Provider=MySql" ^
+                            -e "Database__ConnectionString=Server=pharmeasy-mysql;Port=3306;Database=pharmeasy;User=root;Password=root;" ^
+                            -e "Jwt__SecretKey=masaiseceret_pharmeasy_jwt_secret_key_2024" ^
+                            -e "Smtp__Host=smtp.gmail.com" ^
+                            -e "Smtp__Port=587" ^
+                            -e "Smtp__Username=adheenalnest@gmail.com" ^
+                            -e "Smtp__Password=swvt papw wcou lois" ^
+                            -e "Smtp__From=adheenalnest@gmail.com" ^
+                            -e "Razorpay__KeyId=rzp_test_Syl5owGtFUehSW" ^
+                            -e "Razorpay__KeySecret=05dw8wKk5XjjkLYJfz9lQ5eG" ^
+                            -e "Razorpay__Currency=INR" ^
+                            -e "Razorpay__CallbackUrl=http://localhost:4201/order-success" ^
+                            -e "Razorpay__BookingCallbackUrl=http://localhost:4201/booking-success" ^
+                            ${IMAGE_NAME}:latest
+                    """
                 }
             }
         }
