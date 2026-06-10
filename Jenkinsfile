@@ -31,13 +31,14 @@ pipeline {
                     // Create network if it doesn't exist
                     bat "docker network create ${NETWORK_NAME} 2>nul || ver >nul"
 
-                    def mysqlRunning = bat(
+                    // Use returnStatus so a missing container (exit code 1) doesn't crash the pipeline
+                    def mysqlExitCode = bat(
                         script: "docker inspect -f {{.State.Running}} ${DB_CONTAINER}",
-                        returnStdout: true
-                    ).trim()
+                        returnStatus: true
+                    )
 
-                    if (!mysqlRunning.contains('true')) {
-                        echo "MySQL container not running — starting it now."
+                    if (mysqlExitCode != 0) {
+                        echo "MySQL container not found — starting it now."
                         bat "docker rm ${DB_CONTAINER} 2>nul || ver >nul"
                         bat """
                             docker run -d ^
@@ -110,11 +111,12 @@ pipeline {
             steps {
                 script {
                     sleep(time: 10, unit: 'SECONDS')
-                    def status = bat(
+                    // Use returnStatus — exit code 0 means container exists and inspect succeeded
+                    def exitCode = bat(
                         script: "docker inspect -f {{.State.Running}} ${CONTAINER_NAME}",
-                        returnStdout: true
-                    ).trim()
-                    if (!status.contains('true')) {
+                        returnStatus: true
+                    )
+                    if (exitCode != 0) {
                         error "Container ${CONTAINER_NAME} failed to start. Check: docker logs ${CONTAINER_NAME}"
                     }
                     echo "Backend container is healthy and running on port 8081."
