@@ -767,5 +767,17 @@
         <member name="M:PharmeasyAPI.Migrations.AddImageToProductAndCategory.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:PharmeasyAPI.Migrations.AddImageToBlog">
+            <inheritdoc />
+        </member>
+        <member name="M:PharmeasyAPI.Migrations.AddImageToBlog.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PharmeasyAPI.Migrations.AddImageToBlog.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:PharmeasyAPI.Migrations.AddImageToBlog.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
     </members>
 </doc>

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "Ej8KdRRTBlKyXuplOKDWt6QtCirjTYsWZ/1HEAuTnb0=",
+  "Source": "PharmeasyAPI",
+  "BasePath": "_content/PharmeasyAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

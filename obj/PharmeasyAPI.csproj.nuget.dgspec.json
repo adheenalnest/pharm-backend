@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/Users/dejo/Desktop/InternshipPortal/pharmeasy/Pharmeasy-Clone/PharmeasyAPI/PharmeasyAPI.csproj": {}
+    "C:\\Users\\Adheena.L\\OneDrive - NeST Group\\Desktop\\pharmeasy\\Pharmeasy-backend\\PharmeasyAPI.csproj": {}
   },
   "projects": {
-    "/Users/dejo/Desktop/InternshipPortal/pharmeasy/Pharmeasy-Clone/PharmeasyAPI/PharmeasyAPI.csproj": {
+    "C:\\Users\\Adheena.L\\OneDrive - NeST Group\\Desktop\\pharmeasy\\Pharmeasy-backend\\PharmeasyAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/dejo/Desktop/InternshipPortal/pharmeasy/Pharmeasy-Clone/PharmeasyAPI/PharmeasyAPI.csproj",
+        "projectUniqueName": "C:\\Users\\Adheena.L\\OneDrive - NeST Group\\Desktop\\pharmeasy\\Pharmeasy-backend\\PharmeasyAPI.csproj",
         "projectName": "PharmeasyAPI",
-        "projectPath": "/Users/dejo/Desktop/InternshipPortal/pharmeasy/Pharmeasy-Clone/PharmeasyAPI/PharmeasyAPI.csproj",
-        "packagesPath": "/Users/dejo/.nuget/packages/",
-        "outputPath": "/Users/dejo/Desktop/InternshipPortal/pharmeasy/Pharmeasy-Clone/PharmeasyAPI/obj/",
+        "projectPath": "C:\\Users\\Adheena.L\\OneDrive - NeST Group\\Desktop\\pharmeasy\\Pharmeasy-backend\\PharmeasyAPI.csproj",
+        "packagesPath": "C:\\Users\\Adheena.L\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Adheena.L\\OneDrive - NeST Group\\Desktop\\pharmeasy\\Pharmeasy-backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/dejo/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Adheena.L\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -77,6 +77,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.27, 8.0.27]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -85,7 +91,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/Users/dejo/.dotnet8/sdk/8.0.421/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.421/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

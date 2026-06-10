@@ -183,6 +183,7 @@ public class OrdersController : ControllerBase
             Id = order.Product.Id,
             Name = order.Product.Name,
             Summary = order.Product.Summary,
+            Image = order.Product.Image,
             Price = order.Product.Price,
             DiscountedPrice = order.Product.DiscountedPrice,
             Quantity = order.Quantity,

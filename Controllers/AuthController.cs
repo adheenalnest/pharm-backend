@@ -9,6 +9,7 @@ namespace PharmeasyAPI.Controllers;
 
 /// <summary>OTP-based authentication for customers, admins, and doctors.</summary>
 [ApiController]
+[Route("auth")]
 [Produces("application/json")]
 public class AuthController : ControllerBase
 {
@@ -32,7 +33,7 @@ public class AuthController : ControllerBase
     {
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == req.Email);
         if (user is null)
-        {
+        {   
             user = new User { Email = req.Email, IsNew = true };
             _db.Users.Add(user);
         }
@@ -43,7 +44,10 @@ public class AuthController : ControllerBase
         user.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
-        await _otp.SendOtpEmailAsync(req.Email, otpCode);
+
+        // Fire-and-forget: don't block the HTTP response waiting for SMTP.
+        // OtpService already catches and logs any email failures internally.
+        _ = _otp.SendOtpEmailAsync(req.Email, otpCode);
 
         return Ok(new { message = "OTP sent to your email." });
     }
@@ -128,3 +132,5 @@ public class AuthController : ControllerBase
         UpdatedAt = user.UpdatedAt
     };
 }
+
+

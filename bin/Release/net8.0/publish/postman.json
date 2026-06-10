@@ -1,0 +1,4771 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Pharmeasy API",
+        "description": "REST API for the **Pharmeasy** pharmacy and doctor-consultation platform.\n\n## Authentication\nProtected endpoints require a **Bearer JWT** token.\n1. Call `POST /send-otp` with your email to receive a one-time password.\n2. Call `POST /verify-otp/customer` (or `/admin`, `/doctor`) with the OTP to receive a token.\n3. Click **Authorize** above and paste the token (no `Bearer ` prefix needed).\n\n## Roles\n| Role | Access |\n|------|--------|\n| **Customer** | Products, cart, orders, bookings, coupon apply |\n| **Doctor** | Own unavailability schedule |\n| **Admin** | Full management access to all resources |",
+        "contact": {
+            "name": "Pharmeasy Dev Team",
+            "email": "dev@pharmeasy.com"
+        },
+        "version": "v1"
+    },
+    "paths": {
+        "/send-otp": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Send a one-time password to the given email address.",
+                "description": "Creates a new user record if the email is not registered. OTP expires in 10 minutes.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SendOtpRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SendOtpRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SendOtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent successfully."
+                    }
+                }
+            }
+        },
+        "/verify-otp/customer": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify an OTP and sign in as a Customer.",
+                "description": "Returns a JWT token scoped to the Customer role on success.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "JWT token and user info returned."
+                    },
+                    "400": {
+                        "description": "Invalid or expired OTP, or email not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/verify-otp/admin": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify an OTP and sign in as an Admin.",
+                "description": "Returns a JWT token scoped to the Admin role on success.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "JWT token and user info returned."
+                    },
+                    "400": {
+                        "description": "Invalid or expired OTP, or email not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/verify-otp/doctor": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify an OTP and sign in as a Doctor.",
+                "description": "Returns a JWT token scoped to the Doctor role on success.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyOtpRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "JWT token and user info returned."
+                    },
+                    "400": {
+                        "description": "Invalid or expired OTP, or email not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/blogs": {
+            "post": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Create a new blog post. (Admin only)",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateBlogRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateBlogRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateBlogRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Blog post created and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "List all blog posts, newest first.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of blog posts."
+                    }
+                }
+            }
+        },
+        "/blogs/{id}": {
+            "get": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Retrieve a single blog post by ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Blog post ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Blog post found and returned."
+                    },
+                    "404": {
+                        "description": "No blog post with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Partially update a blog post (only supplied fields are changed). (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Blog post ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchBlogRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchBlogRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchBlogRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Blog post updated and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No blog post with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Delete a blog post by ID. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Blog post ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Blog post deleted."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No blog post with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/checkout/booking": {
+            "post": {
+                "tags": [
+                    "BookingCheckout"
+                ],
+                "summary": "Initiate a doctor-appointment booking and create a Razorpay payment link.",
+                "description": "**Flow:**\r\n1. Validates the doctor exists and is active.\r\n2. Parses the time slot string (format: `HH:mm-HH:mm`, e.g. `09:00-09:30`).\r\n3. Creates a pending `BookingSession` with a JSON snapshot of the booking data.\r\n4. Calls the Razorpay API to generate a payment link for the consultation fee.\r\n5. Returns all booking details plus the Razorpay `paymentLinkUrl`.\r\n            \r\nThe actual `Booking` record is only created after Razorpay fires the\r\n`payment_link.paid` webhook to `POST /checkout/razorpay/webhook`.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookingCheckoutRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookingCheckoutRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BookingCheckoutRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Booking session created; returns booking details and Razorpay payment URL."
+                    },
+                    "400": {
+                        "description": "Invalid time slot format, or customer profile not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Doctor not found or inactive.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Razorpay payment link creation failed."
+                    }
+                }
+            }
+        },
+        "/bookings/customer": {
+            "get": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "List the authenticated customer's bookings, newest appointment first.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of the customer's bookings."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not a Customer.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Customer profile not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bookings/doctor": {
+            "get": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "List the authenticated doctor's bookings, newest appointment first.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of the doctor's bookings."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not a Doctor.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Doctor profile not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/cart/add": {
+            "post": {
+                "tags": [
+                    "Carts"
+                ],
+                "summary": "Add a product to the cart (or increase its quantity if already present).",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddToCartRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddToCartRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AddToCartRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated cart with all items and recalculated total."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/cart/remove": {
+            "post": {
+                "tags": [
+                    "Carts"
+                ],
+                "summary": "Remove a product from the cart (or decrease its quantity).",
+                "description": "If `quantity` is omitted or equals/exceeds the current quantity the item is removed entirely.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RemoveFromCartRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RemoveFromCartRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RemoveFromCartRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated cart after removal."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Cart or product not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/cart": {
+            "get": {
+                "tags": [
+                    "Carts"
+                ],
+                "summary": "Retrieve the current user's cart with all items and the recalculated total.",
+                "parameters": [
+                    {
+                        "name": "couponName",
+                        "in": "query",
+                        "description": "Optional coupon code to preview the discounted total (coupon is NOT applied or recorded).",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cart with items and total price. When a valid coupon is supplied, includes a `couponPreview` object with the discount breakdown."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No active cart for this user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Carts"
+                ],
+                "summary": "Delete the current user's entire cart and all its items.",
+                "responses": {
+                    "200": {
+                        "description": "Cart deleted."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No active cart for this user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/categories": {
+            "post": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Create a new product category. (Admin only)",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category created and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Retrieve all categories, each including their associated products.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated, alphabetically ordered list of categories."
+                    }
+                }
+            }
+        },
+        "/categories/{id}": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Retrieve a single category by ID, including its products.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Category ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category found and returned."
+                    },
+                    "404": {
+                        "description": "No category with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Replace all fields of a category. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Category ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCategoryRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCategoryRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category updated and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No category with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Partially update a category (only supplied fields are changed). (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Category ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchCategoryRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchCategoryRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchCategoryRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Category updated and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No category with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Delete a category by ID. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Category ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Category deleted."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No category with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/coupons": {
+            "post": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Create a new discount coupon. (Admin only)",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCouponRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCouponRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCouponRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Coupon created and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "A coupon with this name already exists.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "List all coupons including their usage records.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated, alphabetically ordered list of coupons."
+                    }
+                }
+            }
+        },
+        "/coupons/{id}": {
+            "get": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Retrieve a single coupon by ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Coupon ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Coupon found and returned."
+                    },
+                    "404": {
+                        "description": "No coupon with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Partially update a coupon (only supplied fields are changed). (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Coupon ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchCouponRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchCouponRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchCouponRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Coupon updated and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No coupon with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Delete a coupon by ID. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Coupon ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Coupon deleted."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No coupon with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/coupons/apply": {
+            "post": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Apply a coupon to the authenticated customer's cart and record usage.",
+                "description": "Validates the coupon name and the customer's remaining usage allowance before applying the discount.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApplyCouponRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApplyCouponRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ApplyCouponRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Discount amount and new cart total returned."
+                    },
+                    "400": {
+                        "description": "Coupon not applicable or customer/cart not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Coupon name not recognised.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/covids": {
+            "post": {
+                "tags": [
+                    "Covids"
+                ],
+                "summary": "Create a COVID product/test entry.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Entry created and returned."
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Covids"
+                ],
+                "summary": "List all COVID product/test entries.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of COVID entries."
+                    }
+                }
+            }
+        },
+        "/covids/{id}": {
+            "delete": {
+                "tags": [
+                    "Covids"
+                ],
+                "summary": "Delete a COVID entry by ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Entry ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entry deleted and returned."
+                    },
+                    "404": {
+                        "description": "No entry with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deliverycharges": {
+            "post": {
+                "tags": [
+                    "DeliveryCharges"
+                ],
+                "summary": "Create a delivery charge record for a pincode. (Admin only)",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDeliveryChargeRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDeliveryChargeRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDeliveryChargeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Record created and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "A record for this pincode already exists.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "DeliveryCharges"
+                ],
+                "summary": "List all delivery charge records ordered by pincode.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of delivery charge records."
+                    }
+                }
+            }
+        },
+        "/deliverycharges/{id}": {
+            "get": {
+                "tags": [
+                    "DeliveryCharges"
+                ],
+                "summary": "Retrieve a delivery charge record by ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Delivery charge record ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Record found and returned."
+                    },
+                    "404": {
+                        "description": "No record with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "DeliveryCharges"
+                ],
+                "summary": "Partially update a delivery charge record. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Delivery charge record ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchDeliveryChargeRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchDeliveryChargeRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchDeliveryChargeRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Record updated and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No record with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Another record already uses the new pincode.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "DeliveryCharges"
+                ],
+                "summary": "Delete a delivery charge record by ID. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Delivery charge record ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Record deleted."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No record with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deliverycharges/check": {
+            "get": {
+                "tags": [
+                    "DeliveryCharges"
+                ],
+                "summary": "Check delivery availability and charge for a specific pincode.",
+                "parameters": [
+                    {
+                        "name": "pincode",
+                        "in": "query",
+                        "description": "The postal pincode to check.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delivery status and charge (charge is null when pincode is unknown)."
+                    },
+                    "400": {
+                        "description": "Pincode query parameter is missing.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doctors": {
+            "post": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Create a new doctor account and profile. (Admin only)",
+                "description": "Creates a User with role Doctor and a linked DoctorProfile in a single call.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDoctorRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDoctorRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDoctorRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Doctor created; returns the profile DTO."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "A user with this email already exists.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "List all doctor profiles. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of all profiles, newest first."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doctors/{id}": {
+            "patch": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Partially update a doctor profile. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "DoctorProfile ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchDoctorRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchDoctorRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchDoctorRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No doctor profile with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Another user already uses the supplied email.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Delete a doctor profile. (Admin only)",
+                "description": "The underlying user is demoted to Customer role to preserve booking history.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "DoctorProfile ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doctor profile removed."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No doctor profile with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Retrieve a single doctor profile by ID. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "DoctorProfile ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile found and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No doctor profile with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doctors/customer": {
+            "get": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "List all active doctors (summary view for customers). No authentication required.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated, alphabetically ordered list of active doctors with consultation fee."
+                    }
+                }
+            }
+        },
+        "/doctors/customer/{id}": {
+            "get": {
+                "tags": [
+                    "Doctors"
+                ],
+                "summary": "Get a doctor's full profile with per-weekday available 30-minute slots. No authentication required.",
+                "description": "Available slots are computed by subtracting the doctor's unavailability blocks from the full 24-hour day,\r\nthen splitting each resulting window into 30-minute intervals (e.g. `09:00–09:30`, `09:30–10:00`).",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "DoctorProfile ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Doctor detail with weekly availability slots."
+                    },
+                    "404": {
+                        "description": "No active doctor with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doctor-unavailabilities/doctor": {
+            "post": {
+                "tags": [
+                    "DoctorUnavailabilities"
+                ],
+                "summary": "Add an unavailability block for the authenticated doctor's own schedule.",
+                "description": "startTime and endTime must be in `HH:mm` format. endTime must be after startTime.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDoctorUnavailabilityRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDoctorUnavailabilityRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDoctorUnavailabilityRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Unavailability block created and returned."
+                    },
+                    "400": {
+                        "description": "Invalid time format or end time not after start time.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not a Doctor.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No doctor profile linked to the authenticated user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "DoctorUnavailabilities"
+                ],
+                "summary": "List all unavailability blocks for the authenticated doctor.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated unavailability blocks ordered by weekday and start time."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not a Doctor.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No doctor profile linked to the authenticated user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doctor-unavailabilities/admin": {
+            "post": {
+                "tags": [
+                    "DoctorUnavailabilities"
+                ],
+                "summary": "Add an unavailability block for any doctor by profile ID. (Admin only)",
+                "description": "startTime and endTime must be in `HH:mm` format. endTime must be after startTime.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDoctorUnavailabilityAdminRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDoctorUnavailabilityAdminRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateDoctorUnavailabilityAdminRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Unavailability block created and returned."
+                    },
+                    "400": {
+                        "description": "Invalid time format.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No doctor profile with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doctor-unavailabilities/admin/{doctorProfileId}": {
+            "get": {
+                "tags": [
+                    "DoctorUnavailabilities"
+                ],
+                "summary": "List all unavailability blocks for a specific doctor by profile ID. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "doctorProfileId",
+                        "in": "path",
+                        "description": "DoctorProfile ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated unavailability blocks ordered by weekday and start time."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/doctor-unavailabilities/{id}": {
+            "get": {
+                "tags": [
+                    "DoctorUnavailabilities"
+                ],
+                "summary": "Retrieve a single unavailability block by ID. Accessible by the owning doctor or an Admin.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unavailability block ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Block found and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Block does not belong to the authenticated doctor.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No block with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "DoctorUnavailabilities"
+                ],
+                "summary": "Partially update an unavailability block. Accessible by the owning doctor or an Admin.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unavailability block ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchDoctorUnavailabilityRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchDoctorUnavailabilityRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchDoctorUnavailabilityRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Block updated and returned."
+                    },
+                    "400": {
+                        "description": "Invalid time format.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Block does not belong to the authenticated doctor.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No block with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "DoctorUnavailabilities"
+                ],
+                "summary": "Delete an unavailability block. Accessible by the owning doctor or an Admin.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Unavailability block ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Block deleted."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Block does not belong to the authenticated doctor.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No block with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcaredata": {
+            "post": {
+                "tags": [
+                    "HealthcareData"
+                ],
+                "summary": "Create a healthcare data entry.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateHealthcareDataRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateHealthcareDataRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateHealthcareDataRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Entry created and returned."
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "HealthcareData"
+                ],
+                "summary": "List all healthcare data entries.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of entries."
+                    }
+                }
+            }
+        },
+        "/healthcaredata/{id}": {
+            "delete": {
+                "tags": [
+                    "HealthcareData"
+                ],
+                "summary": "Delete a healthcare data entry by ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Entry ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entry deleted and returned."
+                    },
+                    "404": {
+                        "description": "No entry with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/HealthcareDevices": {
+            "post": {
+                "tags": [
+                    "HealthcareDevices"
+                ],
+                "summary": "Create a healthcare device entry.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Entry created and returned."
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "HealthcareDevices"
+                ],
+                "summary": "List all healthcare device entries.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of entries."
+                    }
+                }
+            }
+        },
+        "/HealthcareDevices/{id}": {
+            "delete": {
+                "tags": [
+                    "HealthcareDevices"
+                ],
+                "summary": "Delete a healthcare device entry by ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Entry ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entry deleted and returned."
+                    },
+                    "404": {
+                        "description": "No entry with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/HealthFoodandDrinks": {
+            "post": {
+                "tags": [
+                    "HealthFoodAndDrinks"
+                ],
+                "summary": "Create a health food or drink entry.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Entry created and returned."
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "HealthFoodAndDrinks"
+                ],
+                "summary": "List all health food and drink entries.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of entries."
+                    }
+                }
+            }
+        },
+        "/HealthFoodandDrinks/{id}": {
+            "delete": {
+                "tags": [
+                    "HealthFoodAndDrinks"
+                ],
+                "summary": "Delete a health food or drink entry by ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Entry ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entry deleted and returned."
+                    },
+                    "404": {
+                        "description": "No entry with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/images/upload": {
+            "post": {
+                "tags": [
+                    "ImageUpload"
+                ],
+                "summary": "Upload an image file and receive its public URL path.",
+                "description": "Send a **multipart/form-data** request with a single field named `image`.\r\nAllowed types: jpg, jpeg, png, gif, webp. Max size: 10 MB.\r\n            \r\nThe returned `imageUrl` (e.g. `/images/abc123.jpg`) can be stored\r\ndirectly in the `image` field when creating or updating a product or category.",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "Image": {
+                                        "type": "string",
+                                        "description": "The image file to upload (jpg, jpeg, png, gif, webp — max 10 MB).",
+                                        "format": "binary"
+                                    }
+                                }
+                            },
+                            "encoding": {
+                                "Image": {
+                                    "style": "form"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Image uploaded successfully; returns the public URL path.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ImageUploadResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "No file provided, unsupported file type, or file exceeds 10 MB.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ImageUploadErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/admin": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "List every order in the system. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of all orders, newest first."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/admin/{id}": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Retrieve a specific order by ID. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Order ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order found and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No order with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/orders": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "List all orders belonging to the currently authenticated customer.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of the customer's orders, newest first."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Customer profile not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Retrieve a specific order that belongs to the authenticated customer.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Order ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order found and returned."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found or does not belong to this customer.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Delete an order. Customers may only delete their own; Admins may delete any.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Order ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order deleted."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Order does not belong to this customer.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No order with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/checkout/products": {
+            "post": {
+                "tags": [
+                    "ProductCheckout"
+                ],
+                "summary": "Initiate checkout for the authenticated customer's cart and generate a Razorpay payment link.",
+                "description": "**Flow:**\r\n1. Resolves the cart and optionally validates/applies a coupon.\r\n2. Creates a `CheckoutSession` with a snapshot of the cart items.\r\n3. Calls the Razorpay API and returns the payment link URL.\r\n            \r\nOrders are only created after Razorpay fires the `payment_link.paid` webhook.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductCheckoutRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductCheckoutRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProductCheckoutRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Checkout initiated; returns cart summary and Razorpay payment URL."
+                    },
+                    "400": {
+                        "description": "Cart is empty, coupon is invalid, or customer profile missing.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Razorpay payment link creation failed."
+                    }
+                }
+            }
+        },
+        "/checkout/razorpay/webhook": {
+            "post": {
+                "tags": [
+                    "ProductCheckout"
+                ],
+                "summary": "Razorpay webhook endpoint — confirms payment for product orders and doctor bookings.",
+                "description": "Razorpay calls this URL after a payment link is paid. The signature in the\r\n`X-Razorpay-Signature` header is verified with HMAC-SHA256 before any action is taken.\r\n            \r\n- For **product** payments: creates Order records and clears the cart.\r\n- For **booking** payments: creates the Booking record linked to customer and doctor.\r\n            \r\nConfigure this URL in the Razorpay dashboard under **Webhooks**.",
+                "responses": {
+                    "200": {
+                        "description": "Webhook processed (always returns 200 to Razorpay, even for no-ops)."
+                    },
+                    "400": {
+                        "description": "Missing or invalid signature, or malformed payload.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/products": {
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Create a new product. (Admin only)",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateProductRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateProductRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateProductRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product created and returned with its category."
+                    },
+                    "400": {
+                        "description": "Referenced category does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "List all products, with optional keyword search and category filter.",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Optional keyword matched against name, summary, and description.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "categoryId",
+                        "in": "query",
+                        "description": "Optional category ID to filter results.",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated, alphabetically ordered list of matching products."
+                    }
+                }
+            }
+        },
+        "/products/{id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Retrieve a single product by ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product found and returned."
+                    },
+                    "404": {
+                        "description": "No product with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Replace all fields of a product. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProductRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProductRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateProductRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product updated and returned."
+                    },
+                    "400": {
+                        "description": "Referenced category does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No product with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Partially update a product (only supplied fields are changed). (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchProductRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchProductRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchProductRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product updated and returned."
+                    },
+                    "400": {
+                        "description": "Referenced category does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No product with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Delete a product by ID. (Admin only)",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Product ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product deleted."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Caller is not an Admin.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No product with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get the authenticated user's profile, including their Customer or Doctor sub-profile.",
+                "description": "Pass the JWT in the `Authorization: Bearer \u003Ctoken\u003E` header.",
+                "responses": {
+                    "200": {
+                        "description": "Returns user info and role-specific profile data."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/complete-profile": {
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Complete the profile of the currently logged-in user.",
+                "description": "Sets the user's name and phone number and marks the account as no longer new.\r\nShould be called once after the first login.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteProfileRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteProfileRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CompleteProfileRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated; returns the full user object."
+                    },
+                    "401": {
+                        "description": "Missing or invalid JWT.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/skincares": {
+            "post": {
+                "tags": [
+                    "Skincare"
+                ],
+                "summary": "Create a skincare product entry.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        },
+                        "text/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        },
+                        "application/*+json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateCategoryItemRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Entry created and returned."
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "Skincare"
+                ],
+                "summary": "List all skincare product entries.",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number (default 1).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Items per page, 1–100 (default 20).",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of entries."
+                    }
+                }
+            }
+        },
+        "/skincares/{id}": {
+            "delete": {
+                "tags": [
+                    "Skincare"
+                ],
+                "summary": "Delete a skincare product entry by ID.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Entry ID.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Entry deleted and returned."
+                    },
+                    "404": {
+                        "description": "No entry with the given ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetails"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AddToCartRequest": {
+                "required": [
+                    "productId"
+                ],
+                "type": "object",
+                "properties": {
+                    "productId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "quantity": {
+                        "maximum": 2147483647,
+                        "minimum": 1,
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ApplyCouponRequest": {
+                "required": [
+                    "couponName"
+                ],
+                "type": "object",
+                "properties": {
+                    "couponName": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "BookingCheckoutRequest": {
+                "required": [
+                    "age",
+                    "appointmentDate",
+                    "doctorProfileId",
+                    "gender",
+                    "modeOfConsult",
+                    "patientName",
+                    "patientNumber",
+                    "timeSlot"
+                ],
+                "type": "object",
+                "properties": {
+                    "doctorProfileId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "timeSlot": {
+                        "minLength": 1,
+                        "type": "string",
+                        "description": "Time slot in HH:mm-HH:mm format, e.g. \"09:00-09:30\"."
+                    },
+                    "appointmentDate": {
+                        "type": "string",
+                        "description": "Date of the appointment in ISO 8601 format, e.g. \"2024-12-25T00:00:00.000Z\".",
+                        "format": "date-time"
+                    },
+                    "patientName": {
+                        "maxLength": 100,
+                        "minLength": 2,
+                        "type": "string"
+                    },
+                    "patientNumber": {
+                        "minLength": 1,
+                        "pattern": "^\\+?[0-9\\s\\-]{7,15}$",
+                        "type": "string"
+                    },
+                    "age": {
+                        "maximum": 150,
+                        "minimum": 1,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "gender": {
+                        "$ref": "#/components/schemas/Gender"
+                    },
+                    "modeOfConsult": {
+                        "$ref": "#/components/schemas/ConsultMode"
+                    },
+                    "prescriptionUpload": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "maxLength": 1000,
+                        "minLength": 0,
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CompleteProfileRequest": {
+                "required": [
+                    "name",
+                    "phone"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "phone": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "tel"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ConsultMode": {
+                "enum": [
+                    "Video",
+                    "Audio",
+                    "InPerson"
+                ],
+                "type": "string"
+            },
+            "CouponType": {
+                "enum": [
+                    "Percentage",
+                    "Amount"
+                ],
+                "type": "string"
+            },
+            "CreateBlogRequest": {
+                "required": [
+                    "blogContent",
+                    "blogName"
+                ],
+                "type": "object",
+                "properties": {
+                    "blogName": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "blogContent": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateCategoryItemRequest": {
+                "required": [
+                    "image",
+                    "price",
+                    "title"
+                ],
+                "type": "object",
+                "properties": {
+                    "image": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "title": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateCategoryRequest": {
+                "required": [
+                    "categoryName"
+                ],
+                "type": "object",
+                "properties": {
+                    "categoryName": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateCouponRequest": {
+                "required": [
+                    "couponName",
+                    "couponType",
+                    "discount",
+                    "value"
+                ],
+                "type": "object",
+                "properties": {
+                    "couponName": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "discount": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "couponType": {
+                        "$ref": "#/components/schemas/CouponType"
+                    },
+                    "value": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "usageLimit": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateDeliveryChargeRequest": {
+                "required": [
+                    "charge",
+                    "isDeliverable",
+                    "pincode"
+                ],
+                "type": "object",
+                "properties": {
+                    "pincode": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "charge": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "isDeliverable": {
+                        "type": "boolean"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateDoctorRequest": {
+                "required": [
+                    "email"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "phone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "qualification": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "specialisation": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "experience": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "consultationFee": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateDoctorUnavailabilityAdminRequest": {
+                "required": [
+                    "doctorProfileId",
+                    "endTime",
+                    "startTime",
+                    "weekday"
+                ],
+                "type": "object",
+                "properties": {
+                    "weekday": {
+                        "$ref": "#/components/schemas/Weekday"
+                    },
+                    "startTime": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "endTime": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "doctorProfileId": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateDoctorUnavailabilityRequest": {
+                "required": [
+                    "endTime",
+                    "startTime",
+                    "weekday"
+                ],
+                "type": "object",
+                "properties": {
+                    "weekday": {
+                        "$ref": "#/components/schemas/Weekday"
+                    },
+                    "startTime": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "endTime": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateHealthcareDataRequest": {
+                "required": [
+                    "dis",
+                    "image",
+                    "title"
+                ],
+                "type": "object",
+                "properties": {
+                    "image": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "title": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "dis": {
+                        "minLength": 1,
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "CreateProductRequest": {
+                "required": [
+                    "categoryId",
+                    "name",
+                    "price"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "discountedPrice": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "summary": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "uses": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "sideEffects": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "directionForUse": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "quickTips": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "storageDisposal": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "dosage": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "modeOfAction": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "categoryId": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Gender": {
+                "enum": [
+                    "Male",
+                    "Female",
+                    "Other"
+                ],
+                "type": "string"
+            },
+            "ImageUploadErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Human-readable error description.",
+                        "nullable": true,
+                        "example": "Unsupported file type '.pdf'. Allowed: jpg, jpeg, png, gif, webp."
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ImageUploadResponse": {
+                "type": "object",
+                "properties": {
+                    "imageUrl": {
+                        "type": "string",
+                        "description": "Public URL path to the uploaded image.",
+                        "nullable": true,
+                        "example": "/images/3f2504e0-4f89-11d3-9a0c-0305e82c3301.jpg"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "PatchBlogRequest": {
+                "type": "object",
+                "properties": {
+                    "blogName": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "blogContent": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "PatchCategoryRequest": {
+                "type": "object",
+                "properties": {
+                    "categoryName": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "PatchCouponRequest": {
+                "type": "object",
+                "properties": {
+                    "couponName": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "discount": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "couponType": {
+                        "$ref": "#/components/schemas/CouponType"
+                    },
+                    "value": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "usageLimit": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "PatchDeliveryChargeRequest": {
+                "type": "object",
+                "properties": {
+                    "pincode": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "charge": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "isDeliverable": {
+                        "type": "boolean",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "PatchDoctorRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "phone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "qualification": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "specialisation": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "experience": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "consultationFee": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "isActive": {
+                        "type": "boolean",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "PatchDoctorUnavailabilityRequest": {
+                "type": "object",
+                "properties": {
+                    "weekday": {
+                        "$ref": "#/components/schemas/Weekday"
+                    },
+                    "startTime": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "endTime": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "PatchProductRequest": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "discountedPrice": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
+                    },
+                    "summary": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "uses": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "sideEffects": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "directionForUse": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "quickTips": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "storageDisposal": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "dosage": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "modeOfAction": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "categoryId": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "ProblemDetails": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "title": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    },
+                    "detail": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "instance": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": {}
+            },
+            "ProductCheckoutRequest": {
+                "type": "object",
+                "properties": {
+                    "couponName": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "RemoveFromCartRequest": {
+                "required": [
+                    "productId"
+                ],
+                "type": "object",
+                "properties": {
+                    "productId": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "format": "int32",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "SendOtpRequest": {
+                "required": [
+                    "email"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "email"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "UpdateCategoryRequest": {
+                "required": [
+                    "categoryName"
+                ],
+                "type": "object",
+                "properties": {
+                    "categoryName": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "UpdateProductRequest": {
+                "required": [
+                    "categoryId",
+                    "name",
+                    "price"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "minLength": 1,
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "discountedPrice": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "summary": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "uses": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "sideEffects": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "directionForUse": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "quickTips": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "storageDisposal": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "dosage": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "modeOfAction": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "categoryId": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "VerifyOtpRequest": {
+                "required": [
+                    "email",
+                    "otp"
+                ],
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "minLength": 1,
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "otp": {
+                        "maxLength": 6,
+                        "minLength": 6,
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "Weekday": {
+                "enum": [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday"
+                ],
+                "type": "string"
+            }
+        },
+        "securitySchemes": {
+            "Bearer": {
+                "type": "http",
+                "description": "Enter your JWT token (without the 'Bearer ' prefix).",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+    "security": [
+        {
+            "Bearer": []
+        }
+    ]
+}

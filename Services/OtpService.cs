@@ -8,10 +8,12 @@ namespace PharmeasyAPI.Services;
 public class OtpService
 {
     private readonly IConfiguration _config;
+    private readonly ILogger<OtpService> _logger;
 
-    public OtpService(IConfiguration config)
+    public OtpService(IConfiguration config, ILogger<OtpService> logger)
     {
         _config = config;
+        _logger = logger;
     }
 
     public string GenerateOtp() =>
@@ -28,25 +30,44 @@ public class OtpService
 
     public async Task SendOtpEmailAsync(string toEmail, string otp)
     {
+        // Always log OTP to console for easy dev testing
+        _logger.LogWarning("=== OTP for {Email}: {Otp} ===", toEmail, otp);
+
         var smtp = _config.GetSection("Smtp");
-        var host = smtp["Host"] ?? throw new InvalidOperationException("Smtp:Host not configured");
+        var host = smtp["Host"];
+        var username = smtp["Username"];
+        var password = smtp["Password"];
+
+        if (string.IsNullOrEmpty(host) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+        {
+            _logger.LogWarning("SMTP not configured — OTP only printed to console.");
+            return;
+        }
+
         var port = int.Parse(smtp["Port"] ?? "587");
-        var username = smtp["Username"] ?? throw new InvalidOperationException("Smtp:Username not configured");
-        var password = smtp["Password"] ?? throw new InvalidOperationException("Smtp:Password not configured");
         var from = smtp["From"] ?? username;
 
-        using var client = new SmtpClient(host, port)
+        try
         {
-            Credentials = new NetworkCredential(username, password),
-            EnableSsl = true
-        };
+            using var client = new SmtpClient(host, port)
+            {
+                Credentials = new NetworkCredential(username, password),
+                EnableSsl = true
+            };
 
-        var mail = new MailMessage(from, toEmail)
+            var mail = new MailMessage(from, toEmail)
+            {
+                Subject = "Your Pharmeasy OTP",
+                Body = $"Your OTP is: {otp}\n\nThis code expires in 10 minutes. Do not share it with anyone."
+            };
+
+            await client.SendMailAsync(mail);
+            _logger.LogInformation("OTP email sent to {Email}", toEmail);
+        }
+        catch (Exception ex)
         {
-            Subject = "Your Pharmeasy OTP",
-            Body = $"Your OTP is: {otp}\n\nThis code expires in 10 minutes. Do not share it with anyone."
-        };
-
-        await client.SendMailAsync(mail);
+            // Email failure must not block login — OTP is still printed to console above
+            _logger.LogError(ex, "Failed to send OTP email to {Email}. Use console OTP instead.", toEmail);
+        }
     }
 }

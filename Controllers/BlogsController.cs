@@ -32,7 +32,7 @@ public class BlogsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Create([FromBody] CreateBlogRequest req)
     {
-        var blog = new Blog { BlogName = req.BlogName, BlogContent = req.BlogContent };
+        var blog = new Blog { BlogName = req.BlogName, BlogContent = req.BlogContent, Image = req.Image };
         _db.Blogs.Add(blog);
         await _db.SaveChangesAsync();
         return Ok(blog);
@@ -84,6 +84,7 @@ public class BlogsController : ControllerBase
 
         if (!string.IsNullOrWhiteSpace(req.BlogName)) blog.BlogName = req.BlogName;
         if (!string.IsNullOrWhiteSpace(req.BlogContent)) blog.BlogContent = req.BlogContent;
+        if (req.Image != null) blog.Image = req.Image;
         blog.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
