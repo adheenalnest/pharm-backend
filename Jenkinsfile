@@ -32,14 +32,18 @@ pipeline {
                 script {
                     bat "docker network create ${NETWORK_NAME} 2>nul || ver >nul"
 
-                    def mysqlExitCode = bat(
+                    def mysqlState = bat(
                         script: "docker inspect -f {{.State.Running}} ${DB_CONTAINER}",
-                        returnStatus: true
-                    )
+                        returnStdout: true,
+                        returnStatus: false
+                    ).trim()
 
-                    if (mysqlExitCode != 0) {
-                        echo "MySQL container not found — starting it now."
-                        bat "docker rm ${DB_CONTAINER} 2>nul || ver >nul"
+                    if (mysqlState.contains('true')) {
+                        echo "MySQL container is already running."
+                    } else {
+                        echo "MySQL not running — stopping old container (if any) and starting fresh."
+                        bat "docker stop ${DB_CONTAINER} 2>nul || ver >nul"
+                        bat "docker rm   ${DB_CONTAINER} 2>nul || ver >nul"
                         bat """
                             docker run -d ^
                                 --name ${DB_CONTAINER} ^
@@ -53,9 +57,10 @@ pipeline {
                         """
                         echo "Waiting for MySQL to be ready..."
                         sleep(time: 20, unit: 'SECONDS')
-                    } else {
-                        echo "MySQL container is already running."
                     }
+
+                    // Ensure MySQL is on the correct network
+                    bat "docker network connect ${NETWORK_NAME} ${DB_CONTAINER} 2>nul || ver >nul"
                 }
             }
         }
